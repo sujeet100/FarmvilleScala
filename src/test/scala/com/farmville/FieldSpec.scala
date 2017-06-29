@@ -48,7 +48,7 @@ class FieldSpec extends FlatSpec with Matchers {
       .subscribe(dummyFarmer)
 
     for (i <- 1 to 5)
-      farm.updateState
+      farm.updateState()
 
     farm.fields should be(List(Field("1", None), Field("2", None), Field("3", None)))
 
