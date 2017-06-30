@@ -11,3 +11,5 @@ object Wheat extends Crop("Wheat", 120)
 
 object Corn extends Crop("Corn", 180)
 
+object Sugarcane extends Crop("Sugarcane", 60)
+
