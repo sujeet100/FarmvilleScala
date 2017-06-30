@@ -21,14 +21,12 @@ case class Bakery(silo: Silo, numberOfSlot: Int = 3, var slots: List[Slot] = Lis
     })
   }
 
-  def makeBread: Unit = {
-    if (silo.crops.count(_ == Wheat) == 3) {
-      val remainingWheat = silo.crops.filter(x => x == Wheat).drop(3)
-      silo.crops = silo.crops.filter(x => x != Wheat)
-      remainingWheat foreach (w => silo.crops = w :: silo.crops)
+  def makeRecipe(recipe: Recipe): Unit = {
+    if (canBeMade(recipe)) {
+      getIngredients(recipe)
       val emptySLot = slots.find(x => x.recipe.isEmpty)
       emptySLot match {
-        case Some(Slot(recipe, percentageCompleted)) => slots = slots.map(s => if (emptySLot.contains(s)) Slot(Some(Bread)) else s);
+        case Some(Slot(r, percentageCompleted)) => slots = slots.map(s => if (emptySLot.contains(s)) Slot(Some(Bread)) else s);
         case None => throw new RuntimeException("No empty slot")
       }
 
@@ -37,11 +35,22 @@ case class Bakery(silo: Silo, numberOfSlot: Int = 3, var slots: List[Slot] = Lis
     }
   }
 
+  private def getIngredients(recipe: Recipe) = {
+    recipe.ingredients.foreach(i => silo.withdraw(i))
+  }
+
+  private def canBeMade(recipe: Recipe) = {
+    recipe.ingredients.forall(silo.hasEnough)
+  }
 }
 
-abstract case class Recipe(timeInSeconds: Int)
+abstract case class Recipe(timeInSeconds: Int, ingredients: List[(Crop, Int)]) {
 
-object Bread extends Recipe(2)
+}
+
+object Bread extends Recipe(2, List((Wheat, 3)))
+
+object CupCake extends Recipe(10, List((Wheat, 2), (Corn, 1)))
 
 case class Slot(recipe: Option[Recipe], var percentageCompleted: Double = 0) {
   def isReady: Boolean = recipe.isDefined && percentageCompleted >= 100

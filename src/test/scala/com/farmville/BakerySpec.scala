@@ -12,7 +12,15 @@ class BakerySpec extends FlatSpec with Matchers {
   it should "be able to produce a bread if silo has 3 wheat" in {
     val silo: Silo = Silo(List(Wheat, Wheat, Wheat))
     val bakery: Bakery = Bakery(silo)
-    bakery.makeBread
+    bakery.makeRecipe(Bread)
+    silo should be(Silo(Nil))
+
+  }
+
+  it should "be able to produce a cupcake if silo has 2 wheat and 1 corn" in {
+    val silo: Silo = Silo(List(Wheat, Wheat, Corn))
+    val bakery: Bakery = Bakery(silo)
+    bakery.makeRecipe(CupCake)
     silo should be(Silo(Nil))
 
   }
@@ -33,7 +41,7 @@ class BakerySpec extends FlatSpec with Matchers {
       .subscribeOn(ComputationScheduler())
       .subscribe(dummyFarmer)
 
-    bakery.makeBread
+    bakery.makeRecipe(Bread)
 
     for (i <- 1 to 2)
       bakery.updateState()
